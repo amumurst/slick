@@ -33,16 +33,7 @@ inThisBuild(
         Developer("szeiger", "Stefan Zeiger", "", url("http://szeiger.de")),
         Developer("hvesalai", "Heikki Vesalainen", "", url("https://github.com/hvesalai/"))
       ),
-    scmInfo := Some(ScmInfo(url("https://github.com/slick/slick"), "scm:git:git@github.com:slick/slick.git")),
-    scalacOptions ++=
-      List(
-        "-deprecation",
-        "-feature",
-        "-unchecked",
-        "-Xsource:3",
-        "-Wunused:imports",
-        "-Wconf:cat=unused-imports&src=src_managed/.*:silent"
-      )
+    scmInfo := Some(ScmInfo(url("https://github.com/slick/slick"), "scm:git:git@github.com:slick/slick.git"))
   )
 )
 
@@ -63,6 +54,12 @@ def slickGeneralSettings =
       _.withConfigurations(Vector(Compile, Runtime, Optional))
     },
     sonatypeProfileName := "com.typesafe.slick",
+    scalacOptions ++=
+      List("-deprecation", "-feature", "-unchecked") ++
+        (if (scalaVersion.value.startsWith("2."))
+          List("-Xsource:3", "-Wunused:imports", "-Wconf:cat=unused-imports&src=src_managed/.*:silent")
+        else
+          List("-source:3.0-migration")),
     Compile / doc / scalacOptions ++= Seq(
       "-doc-title", name.value,
       "-doc-version", version.value,
@@ -75,11 +72,13 @@ def slickGeneralSettings =
     logBuffered := false
   )
 
-// set the scala-compiler dependency unless a local scala is in use
+// add a scala 2 compiler dependency unless a local scala is in use
 def compilerDependencySetting(config: String) =
-  if (sys.props("scala.home.local") != null) Nil else Seq(
-    libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value % config
-  )
+  libraryDependencies ++=
+    (if (sys.props("scala.home.local") == null && scalaVersion.value.startsWith("2."))
+      List("org.scala-lang" % "scala-compiler" % scalaVersion.value % config)
+    else
+      Nil)
 
 def extTarget(extName: String): Seq[Setting[File]] =
   sys.props("slick.build.target") match {
@@ -121,6 +120,7 @@ lazy val slick =
   project
     .enablePlugins(MimaPlugin)
     .settings(
+      crossScalaVersions += "3.2.2",
       slickGeneralSettings,
       compilerDependencySetting("provided"),
       FMPP.preprocessorSettings,

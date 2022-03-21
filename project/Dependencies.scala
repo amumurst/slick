@@ -1,4 +1,4 @@
-import sbt._
+import sbt.*
 
 /** Dependencies for reuse in different parts of the build */
 object Dependencies {
