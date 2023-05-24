@@ -144,6 +144,7 @@ lazy val testkit =
     .configs(DocTest)
     .dependsOn(slick, codegen % s"compile->compile;${TypeProviders.TypeProvidersConfig.name}->test", hikaricp)
     .settings(
+      crossScalaVersions += "3.2.2",
       slickGeneralSettings,
       compilerDependencySetting(Provided.name),
       compilerDependencySetting(TypeProviders.TypeProvidersConfig.name),
@@ -217,6 +218,7 @@ lazy val codegen =
     .in(file("slick-codegen"))
     .dependsOn(slick)
     .settings(
+      crossScalaVersions += "3.2.2",
       slickGeneralSettings,
       extTarget("codegen"),
       name := "Slick-CodeGen",
@@ -231,6 +233,7 @@ lazy val hikaricp =
     .in(file("slick-hikaricp"))
     .dependsOn(slick)
     .settings(
+      crossScalaVersions += "3.2.2",
       slickGeneralSettings,
       extTarget("hikaricp"),
       name := "Slick-HikariCP",
